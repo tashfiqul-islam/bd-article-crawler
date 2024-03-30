@@ -1,0 +1,39 @@
+def parse_article(self, url):
+    try:
+        print(f"Fetching article from URL: {url}")
+        article_soup = BeautifulSoup(requests.get(url).text, "html.parser")
+
+        # Extracting title
+        title_tag = article_soup.find("h1")
+        title = title_tag.get_text().strip() if title_tag else "Unknown"
+
+        # Extracting date
+        date_tag = article_soup.find("span", {"class": "time"})
+        date = date_tag.get_text().strip() if date_tag else "Unknown"
+
+        # Extracting author
+        author_tag = article_soup.find("div", {"class": "name"})
+        author = author_tag.get_text().strip() if author_tag else "Unknown"
+
+        # Extracting content
+        content_tag = article_soup.find("div", {"class": "details"})
+        content = content_tag.get_text().strip() if content_tag else "Unknown"
+
+        # Extracting category
+        category_tag = article_soup.find("div", {"class": "breadcum-box"})
+        category = category_tag.find("a").get_text().strip() if category_tag else "Unknown"
+
+        self.articles.append(
+            {
+                "title": title,
+                "date": date,
+                "author": author,
+                "content": content,
+                "category": category,
+                "url": url,
+            }
+        )
+    except requests.exceptions.RequestException as e:
+        print("Failed to parse article:", url, e)
+    except AttributeError:
+        print("Failed to find necessary elements in the article:", url)
