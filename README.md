@@ -1,7 +1,7 @@
 # BD News Article Crawler - WIP
 
 ```plaintext
-bangla_news_crawler/ # Root folder for the Bangla News Crawler project
+bd_news_crawler/ # Root folder for the Bangla News Crawler project
 │
 ├── src/ # Source code files
 │ ├── bdp_crawler.py # Crawler for BD Pratidin website
