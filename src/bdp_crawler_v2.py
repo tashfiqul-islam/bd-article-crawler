@@ -126,4 +126,4 @@ if __name__ == "__main__":
     start_date = datetime(2024, 3, 30)  # Start date
     end_date = datetime(2024, 3, 31)  # End date
     crawler.fetch_articles(BASE_URL, start_date, end_date)
-    crawler.save_articles_to_json("bdpratidin_articles.json")
+    crawler.save_articles_to_json("./data/bdpratidin_articles.json")

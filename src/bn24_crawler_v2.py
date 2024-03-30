@@ -144,4 +144,4 @@ if __name__ == "__main__":
 
     # Fetch articles and save to JSON
     crawler.fetch_articles(BASE_URL, START_DATE, END_DATE)
-    crawler.save_articles_to_json("banglanews24_articles.json")
+    crawler.save_articles_to_json("./data/banglanews24_articles.json")
