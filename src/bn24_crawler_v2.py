@@ -139,18 +139,11 @@ class BanglaNews24Crawler:
                 """
 
             try:
-                # Iterate over each paragraph
                 for p in content_parts:
-                    # Split the paragraph into sentences
                     sentences = p.get_text().replace("\n", " ").strip().split(".")
-                    # Iterate over each sentence
                     for sentence in sentences:
-                        # Find "বাংলাদেশ সময়:" or "সৌজন্যে:", stop processing this paragraph
-                        if sentence.strip().startswith(
-                            "বাংলাদেশ সময়:"
-                        ) or sentence.strip().startswith("সৌজন্যে:"):
+                        if sentence.strip().startswith("বাংলাদেশ সময়:") or sentence.strip().startswith("সৌজন্যে:"):
                             raise CustomStopIteration
-                        # Otherwise, add the sentence to the list
                         content_sentences.append(sentence)
             except CustomStopIteration:
                 pass
