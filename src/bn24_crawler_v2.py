@@ -36,6 +36,7 @@ class BanglaNews24Crawler:
             return all_category_links
         except requests.exceptions.RequestException as e:
             print("Failed to fetch categories:", e)
+            return None  # Return None in case of failure
 
     def extract_category_links(self, soup):
         """
@@ -145,9 +146,7 @@ class BanglaNews24Crawler:
                     # Iterate over each sentence
                     for sentence in sentences:
                         # Find "বাংলাদেশ সময়:" or "সৌজন্যে:", stop processing this paragraph
-                        if sentence.strip().startswith(
-                            "বাংলাদেশ সময়:"
-                        ) or sentence.strip().startswith("সৌজন্যে:"):
+                        if sentence.strip().startswith("বাংলাদেশ সময়:") or sentence.strip().startswith("সৌজন্যে:"):
                             raise CustomStopIteration
                         # Otherwise, add the sentence to the list
                         content_sentences.append(sentence)
