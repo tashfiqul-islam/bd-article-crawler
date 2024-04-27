@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 nltk tokenizers
+          pip install requests beautifulsoup4 nltk tokenizers pylint
 
       # Runs pylint on Python files
       - name: Analysing the code with pylint
