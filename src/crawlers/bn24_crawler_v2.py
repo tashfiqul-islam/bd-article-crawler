@@ -117,7 +117,7 @@ class BanglaNews24Crawler:
             content = self.extract_content(article_soup)
             author = self.extract_author(article_soup)
             category = self.extract_category(article_soup)
-
+            # pylint: disable=duplicate-code
             self.articles.append({
                 "title": title,
                 "date": date,

@@ -92,7 +92,7 @@ class BengaliNewsCrawler:
                 if category_tag
                 else "Unknown"
             )
-
+            # pylint: disable=duplicate-code
             self.articles.append(
                 {
                     "title": title,
