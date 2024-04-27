@@ -5,7 +5,6 @@ news articles from the BanglaNews24 website.
 
 import json
 from datetime import datetime, timedelta
-import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -113,77 +112,101 @@ class BanglaNews24Crawler:
                 requests.get(url, timeout=10).text, "html.parser"
             )
 
-            # Extracting title
-            title_tag = article_soup.find("img", class_="lazy-load")
-            title = title_tag["alt"].strip() if title_tag else None
+            title = self.extract_title(article_soup)
+            date = self.extract_date(article_soup)
+            content = self.extract_content(article_soup)
+            author = self.extract_author(article_soup)
+            category = self.extract_category(article_soup)
 
-            # Extracting date
-            date_tag = article_soup.find("spam", class_="time")
-            if date_tag:
-                date_str = date_tag.get_text().strip()
-                # Remove "আপডেট:" from the date string
-                date = date_str.replace("আপডেট:", "").strip()
-            else:
-                date = None
+            self.articles.append({
+                "title": title,
+                "date": date,
+                "author": author,
+                "content": content,
+                "category": category,
+                "url": url,
+            })
 
-            # Extracting content
-            content_tag = article_soup.find("article")
-            content_parts = content_tag.find_all("p")
-
-            # Initialize an empty list to hold the sentences
-            content_sentences = []
-
-            class CustomStopIteration(Exception):
-                """
-                Custom exception used to break out of nested loops.
-                """
-
-            try:
-                for p in content_parts:
-                    sentences = p.get_text().replace("\n", " ").strip().split(".")
-                    for sentence in sentences:
-                        if sentence.strip().startswith("বাংলাদেশ সময়:") or sentence.strip().startswith("সৌজন্যে:"):
-                            raise CustomStopIteration
-                        content_sentences.append(sentence)
-            except CustomStopIteration:
-                pass
-
-            # Combine all sentences to get the main content
-            content = " ".join(content_sentences)
-
-            # Remove extra spaces
-            content = re.sub(" +", " ", content)
-
-            # Extracting author
-            author_tag = article_soup.find("div", class_="row news-source")
-            author = (
-                author_tag.find("span").get_text().strip().split("|")[0]
-                if author_tag
-                else "Unknown"
-            )
-
-            # Extracting category
-            category_tag = article_soup.find("div", class_="section-page-title")
-            category = (
-                category_tag.find("h1").get_text().strip()
-                if category_tag
-                else "Unknown"
-            )
-
-            self.articles.append(
-                {
-                    "title": title if title else "Unknown",
-                    "date": date if date else "Unknown",
-                    "author": author,
-                    "content": content,
-                    "category": category,
-                    "url": url,
-                }
-            )
         except requests.exceptions.RequestException as e:
             print("Failed to parse article:", e)
         except AttributeError as e:
             print("Failed to find necessary elements in the article:", e)
+
+    def extract_title(self, soup):
+        """
+        Extracts the title from the article soup.
+
+        Args:
+            soup (BeautifulSoup): The BeautifulSoup object of the article page.
+
+        Returns:
+            str: The title of the article.
+        """
+        title_tag = soup.find("img", class_="lazy-load")
+        return title_tag["alt"].strip() if title_tag else "Unknown"
+
+    def extract_date(self, soup):
+        """
+        Extracts the date from the article soup.
+
+        Args:
+            soup (BeautifulSoup): The BeautifulSoup object of the article page.
+
+        Returns:
+            str: The date of the article.
+        """
+        date_tag = soup.find("span", class_="time")
+        return date_tag.get_text().strip().replace("আপডেট:", "").strip() if date_tag else "Unknown"
+
+    def extract_content(self, soup):
+        """
+        Extracts the content from the article soup.
+
+        Args:
+            soup (BeautifulSoup): The BeautifulSoup object of the article page.
+
+        Returns:
+            str: The content of the article.
+        """
+        content_tag = soup.find("article")
+        content_parts = content_tag.find_all("p")
+        content_sentences = []
+
+        for p in content_parts:
+            sentences = p.get_text().replace("\n", " ").strip().split(".")
+            for sentence in sentences:
+                if sentence.strip().startswith("বাংলাদেশ সময়:") or \
+                    sentence.strip().startswith("সৌজন্যে:"):
+                    break
+                content_sentences.append(sentence)
+
+        return " ".join(content_sentences)
+
+    def extract_author(self, soup):
+        """
+        Extracts the author from the article soup.
+
+        Args:
+            soup (BeautifulSoup): The BeautifulSoup object of the article page.
+
+        Returns:
+            str: The author of the article.
+        """
+        author_tag = soup.find("div", class_="row news-source")
+        return author_tag.find("span").get_text().strip().split("|")[0] if author_tag else "Unknown"
+
+    def extract_category(self, soup):
+        """
+        Extracts the category from the article soup.
+
+        Args:
+            soup (BeautifulSoup): The BeautifulSoup object of the article page.
+
+        Returns:
+            str: The category of the article.
+        """
+        category_tag = soup.find("div", class_="section-page-title")
+        return category_tag.find("h1").get_text().strip() if category_tag else "Unknown"
 
     def save_articles_to_json(self, output_file):
         """
